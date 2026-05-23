@@ -2,10 +2,6 @@ library(dplyr)
 library(tidyr)
 library(gtsummary)
 
-
-HM_nhanes_maui_notcorrected_111525 <- readRDS("~/Documents/Work/PAPERS/MauiWES_heavymetal/heavymetal_spiro/BKMR/NHANES_11_12/HM_nhanes_maui_notcorrected_111525.rds")
-
-
 data_sum <- HM_nhanes_maui_notcorrected_111525 %>% select(
   barium,        
   cadmium,
