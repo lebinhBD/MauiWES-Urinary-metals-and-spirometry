@@ -6,10 +6,13 @@ library(qgcomp)
 
 #### NON-SMOKERS in dual-WQS model ####
 
+data <- HM_lung_demo_nomiss_111525_use
 dim(data)
+table(data$tobaco, useNA = "always")
+
 data1 <- subset(data, data$tobaco ==0)
 dim(data1)
-## A,B,C Sessions ##
+## A, B, C Sessions ##
 data_fvc <- subset(data1, data1$fvc_quality %in% c("A", "B", "C"))
 dim(data_fvc)
 dim(data1)
@@ -47,7 +50,7 @@ results2i_l90 <- gwqs(fvcbelowlln_N ~ pwqs + nwqs + age + male + BMIscore,
 summary(results2i_l90 )
 
 
-## select lamda with the lowest AIC value ##
+## select lambda with the lowest AIC value ##
 coef_mat <- summary(results2i_l90)$coefficients
 coef_mat
 
