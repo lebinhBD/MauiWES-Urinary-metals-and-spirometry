@@ -3,12 +3,18 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(qgcomp)
+library(gWQS)
 
 #### NON-SMOKERS in dual-WQS model ####
 
 data <- HM_lung_demo_nomiss_111525_use
 dim(data)
 table(data$tobaco, useNA = "always")
+
+data <- data %>% rename(
+  "male"= "male_new", 
+ "age" = "age_new"
+)
 
 data1 <- subset(data, data$tobaco ==0)
 dim(data1)
@@ -197,7 +203,6 @@ plot_data |>
 dev.off()
 
 #### fvc weights ####
-# gwqs_barplot(results2i_l90)
 
 weight_fvc <- results2i_l90$final_weights
 weight_fvc
@@ -306,7 +311,7 @@ p_fvc_2iwqs
 #### fev1 < LLN ####
 
 names(data)
-dim(data_fev1)
+dim(data_fev)
 
 fev2i_l90 <- gwqs(fev1belowlln_N ~ pwqs + nwqs + age + male +  BMIscore,
                   mix_name = metals,
@@ -469,9 +474,6 @@ dev.off()
 
 
 #### fev1 weights ####
-# gwqs_barplot(fev2i_l90)
-
-
 weight_fev1 <- fev2i_l90$final_weights
 weight_fev1
 
@@ -741,8 +743,6 @@ dev.off()
 
 
 #### fev1/fvc weights ####
-# gwqs_barplot(fev2i_l90)
-
 
 weight_ff <- ff2i_l90$final_weights
 weight_ff
@@ -1013,9 +1013,6 @@ dev.off()
 
 
 #### fev1/fvc weights ####
-# gwqs_barplot(fev2i_l90)
-
-
 weight_fef <- fef2i_l90$final_weights
 weight_fef
 
@@ -1088,7 +1085,6 @@ names(weight_long_fef)
 weight_long_fef$weight = ifelse(weight_long_fef$direction == "Positive",
                                 weight_long_fef$weight,
                                 -weight_long_fef$weight)    # make negative weights truly negative
-
 
 p_fef_2iwqs <- ggplot(weight_long_fef,
                       aes(x = term,
@@ -1168,9 +1164,9 @@ final_2iwqs <- image_annotate(
 image_write(final_2iwqs, "final_2iwqss_nosmoker.png")
 
 
-#### NON-SMOKERS in Q-gComp model ####
+#### NON-SMOKERS in non-boot Q-gComp model ####
 
-
+#### fvc < LLN ####
 fit_fvc <- qgcomp.glm.noboot(
   f = fvcbelowlln_N ~  as_ln + ca_ln + cd_ln + cu_ln + pb_ln + sb_ln + age + male  + BMIscore,
   expnms = c("as_ln",
@@ -1206,12 +1202,9 @@ data_fvc_qcomp <- data_fvc_qcomp %>%
   select(term, OR, CI_low, CI_high, p)
 
 data_fvc_qcomp
-
-
 data_fvc_qcomp <- data_fvc_qcomp[-1,]
 
 data_fvc_qcomp$term
-
 data_fvc_qcomp[1] <- "Q-gcomp"
 
 
@@ -1257,16 +1250,12 @@ label_text <-
           plot_data$or,
           plot_data$ci_text))
 
-# View(label_text)
-
-
 png("qcom_fvc.png", 
     width = 7,
     height = 2,
     res = 300, 
     units = "in"
 )
-
 
 my_ticks <- c(0.1, 0.5, 1,2,5,10)
 attr(my_ticks, "labels") <- c("0.1", "0.5", "1", "2", "5", "10") ## adjust not decimal or decimal numbers 
@@ -1395,8 +1384,6 @@ p_fvc_qcomp
 
 
 #### fev1 < LLN ####
-
-
 fit_fev <- qgcomp.glm.noboot(
   f = fev1belowlln_N ~  as_ln + ca_ln + cd_ln + cu_ln + pb_ln + sb_ln + age + male  + BMIscore,
   expnms = c("as_ln",
@@ -1432,12 +1419,10 @@ df_fev_qcomp <- df_fev_qcomp %>%
   select(term, OR, CI_low, CI_high, p)
 
 df_fev_qcomp
-
-
 df_fev_qcomp <- df_fev_qcomp[-1,]
 
-df_fev_qcomp$term
 
+df_fev_qcomp$term
 df_fev_qcomp[1] <- "Q-gcomp"
 
 
@@ -1547,28 +1532,21 @@ dev.off()
 
 
 #### fev1 weights ####
-
 pos_df <- data.frame(
   term = names(fit_fev$pos.weights),
   weight = fit_fev$pos.weights,
   direction = "Positive")
-# Remove the row name that is automatically created
 pos_df$term <- rownames(pos_df)
 rownames(pos_df) <- NULL
 
-# 2. Access the negative weights and convert the named vector to a data frame
 neg_df <- data.frame(
   term = names(fit_fev$neg.weights),
-  # Weights are presented as absolute values in the output, so re-apply the negative sign
   weight = -fit_fev$neg.weights, 
   direction = "Negative"
 )
-# Remove the row name that is automatically created
 neg_df$term <- rownames(neg_df)
 rownames(neg_df) <- NULL
 
-
-# 3. Combine the positive and negative weights
 all_weights_df_fev <- rbind(pos_df, neg_df)
 View(all_weights_df_fev)
 colnames(all_weights_df_fev)
@@ -1580,10 +1558,6 @@ all_weights_df_fev <- all_weights_df_fev %>% mutate(
                    term == "cu_ln" ~ "Copper",
                    term == "pb_ln" ~ "Lead",
                    term == "sb_ln" ~ "Antimony"))
-
-
-
-# 4. draw a graph
 
 custom_order <- c("Calcium", "Lead", "Copper", "Cadmium", "Antimony", "Arsenic")
 
@@ -1619,9 +1593,7 @@ p_fev_qcomp <- ggplot(all_weights_df_fev,
             size = 4)
 p_fev_qcomp 
 
-#### fev1/fvc ####
-
-
+#### fev1/fvc < LLN ####
 fit_ff <- qgcomp.glm.noboot(
   f = ffbelowlln_N ~  as_ln + ca_ln + cd_ln + cu_ln + pb_ln + sb_ln + age + male  + BMIscore,
   expnms = c("as_ln",
@@ -1657,8 +1629,6 @@ df_ff_qcomp <- df_ff_qcomp %>%
   select(term, OR, CI_low, CI_high, p)
 
 df_ff_qcomp
-
-
 df_ff_qcomp <- df_ff_qcomp[-1,]
 
 df_ff_qcomp$term
@@ -1845,7 +1815,7 @@ p_ff_qcomp <- ggplot(all_weights_df_ff,
             size = 4)
 p_ff_qcomp 
 
-#### fef2575 ####
+#### fef2575 < LLN ####
 
 # with A, B, C sections in FEV1 #
 data_fef <- subset(data, data$fev1_quality %in% c("A", "B", "C") &
@@ -2009,23 +1979,16 @@ pos_df <- data.frame(
   term = names(fit_fef$pos.weights),
   weight = fit_fef$pos.weights,
   direction = "Positive")
-# Remove the row name that is automatically created
 pos_df$term <- rownames(pos_df)
 rownames(pos_df) <- NULL
 
-# 2. Access the negative weights and convert the named vector to a data frame
 neg_df <- data.frame(
   term = names(fit_fef$neg.weights),
-  # Weights are presented as absolute values in the output, so re-apply the negative sign
   weight = -fit_fef$neg.weights, 
-  direction = "Negative"
-)
-# Remove the row name that is automatically created
+  direction = "Negative")
 neg_df$term <- rownames(neg_df)
 rownames(neg_df) <- NULL
 
-
-# 3. Combine the positive and negative weights
 all_weights_df_fef <- rbind(pos_df, neg_df)
 View(all_weights_df_fef)
 colnames(all_weights_df_fef)
@@ -2038,9 +2001,6 @@ all_weights_df_fef <- all_weights_df_fef %>% mutate(
                    term == "pb_ln" ~ "Lead",
                    term == "sb_ln" ~ "Antimony"))
 
-
-
-# 4. draw a graph
 
 custom_order <- c("Calcium", "Lead", "Copper", "Cadmium", "Antimony", "Arsenic")
 
@@ -2134,3 +2094,205 @@ combined <- image_append(c(imgA_labeled, imgB_labeled), stack = TRUE)
 
 # save
 image_write(combined, "combined_AB_nonsmokers.png")
+
+
+#### NON-SMOKERS in boot Q-gComp model ####
+
+#### fvc < LLN ####
+fit_fvc <- qgcomp.glm.boot(
+  f = fvcbelowlln_N ~  as_ln + ca_ln + cd_ln + cu_ln + pb_ln + sb_ln + age + male  + BMIscore,
+  expnms = c("as_ln",
+             "ca_ln",
+             "cd_ln",
+             "cu_ln",
+             "pb_ln",
+             "sb_ln"),
+  data = data_fvc,
+  q = 4,
+  B = 500,
+  family = binomial()
+)
+summary(fit_fvc)
+
+coefs <- summary(fit_fvc)$coefficients
+
+# Create a results table
+data_fvc_qcomp <- data.frame(
+  term = rownames(coefs),
+  OR = exp(coefs[, "Estimate"]),
+  CI_low = exp(coefs[, "Lower CI"]),
+  CI_high = exp(coefs[, "Upper CI"]),
+  p      = coefs[, "Pr(>|z|)"]
+)
+
+data_fvc_qcomp <- data_fvc_qcomp %>%
+  mutate(
+    OR = round(OR, 2),
+    CI_low = round(CI_low, 2),
+    CI_high = round(CI_high, 2),
+    p = round(p, 3)
+  ) %>%
+  select(term, OR, CI_low, CI_high, p)
+
+data_fvc_qcomp
+data_fvc_qcomp <- data_fvc_qcomp[-1,]
+
+
+#### fev < LLN ####
+
+fit_fev <- qgcomp.glm.boot(
+  f = fev1belowlln_N ~  as_ln + ca_ln + cd_ln + cu_ln + pb_ln + sb_ln + age + male  + BMIscore,
+  expnms = c("as_ln",
+             "ca_ln",
+             "cd_ln",
+             "cu_ln",
+             "pb_ln",
+             "sb_ln"),
+  data = data_fev,
+  q = 4,
+  B = 500, 
+  family = binomial()
+)
+summary(fit_fev)
+
+coefs <- summary(fit_fev)$coefficients
+
+# Create a results table
+df_fev_qcomp <- data.frame(
+  term = rownames(coefs),
+  OR = exp(coefs[, "Estimate"]),
+  CI_low = exp(coefs[, "Lower CI"]),
+  CI_high = exp(coefs[, "Upper CI"]),
+  p      = coefs[, "Pr(>|z|)"]
+)
+
+df_fev_qcomp <- df_fev_qcomp %>%
+  mutate(
+    OR = round(OR, 2),
+    CI_low = round(CI_low, 2),
+    CI_high = round(CI_high, 2),
+    p = round(p, 3)
+  ) %>%
+  select(term, OR, CI_low, CI_high, p)
+
+df_fev_qcomp
+df_fev_qcomp <- df_fev_qcomp[-1,]
+
+
+
+fit_fev <- qgcomp.glm.noboot(
+  f = fev1belowlln_N ~  as_ln + ca_ln + cd_ln + cu_ln + pb_ln + sb_ln + age + male  + BMIscore,
+  expnms = c("as_ln",
+             "ca_ln",
+             "cd_ln",
+             "cu_ln",
+             "pb_ln",
+             "sb_ln"),
+  data = data_fev,
+  q = 4,
+  family = binomial()
+)
+summary(fit_fev)
+
+coefs <- summary(fit_fev)$coefficients
+
+# Create a results table
+df_fev_qcomp <- data.frame(
+  term = rownames(coefs),
+  OR = exp(coefs[, "Estimate"]),
+  CI_low = exp(coefs[, "Lower CI"]),
+  CI_high = exp(coefs[, "Upper CI"]),
+  p      = coefs[, "Pr(>|z|)"]
+)
+
+df_fev_qcomp <- df_fev_qcomp %>%
+  mutate(
+    OR = round(OR, 2),
+    CI_low = round(CI_low, 2),
+    CI_high = round(CI_high, 2),
+    p = round(p, 3)
+  ) %>%
+  select(term, OR, CI_low, CI_high, p)
+
+df_fev_qcomp
+df_fev_qcomp <- df_fev_qcomp[-1,]
+
+
+#### fev1/fvc < LLN ####
+
+fit_ff <- qgcomp.glm.boot(
+  f = ffbelowlln_N ~  as_ln + ca_ln + cd_ln + cu_ln + pb_ln + sb_ln + age + male  + BMIscore,
+  expnms = c("as_ln",
+             "ca_ln",
+             "cd_ln",
+             "cu_ln",
+             "pb_ln",
+             "sb_ln"),
+  data = data_ff,
+  q = 4,
+  B = 500, 
+  family = binomial()
+)
+summary(fit_ff)
+
+coefs <- summary(fit_ff)$coefficients
+
+# Create a results table
+df_ff_qcomp <- data.frame(
+  term = rownames(coefs),
+  OR = exp(coefs[, "Estimate"]),
+  CI_low = exp(coefs[, "Lower CI"]),
+  CI_high = exp(coefs[, "Upper CI"]),
+  p      = coefs[, "Pr(>|z|)"]
+)
+
+df_ff_qcomp <- df_ff_qcomp %>%
+  mutate(
+    OR = round(OR, 2),
+    CI_low = round(CI_low, 2),
+    CI_high = round(CI_high, 2),
+    p = round(p, 3)
+  ) %>%
+  select(term, OR, CI_low, CI_high, p)
+
+df_ff_qcomp
+df_ff_qcomp <- df_ff_qcomp[-1,]
+
+#### fef2575 < LLN ####
+
+fit_fef <- qgcomp.glm.boot(
+  f = fef2575belowlln_N ~  as_ln + ca_ln + cd_ln + cu_ln + pb_ln + sb_ln + age + male + BMIscore,
+  expnms = c("as_ln",
+             "ca_ln",
+             "cd_ln",
+             "cu_ln",
+             "pb_ln",
+             "sb_ln"),
+  data = data_fef,
+  q = 4,
+  B = 500,
+  family = binomial()
+)
+summary(fit_fef)
+
+coefs <- summary(fit_fef)$coefficients
+# Create a results table
+df_fef_qcomp <- data.frame(
+  term = rownames(coefs),
+  OR = exp(coefs[, "Estimate"]),
+  CI_low = exp(coefs[, "Lower CI"]),
+  CI_high = exp(coefs[, "Upper CI"]),
+  p      = coefs[, "Pr(>|z|)"]
+)
+
+df_fef_qcomp <- df_fef_qcomp %>%
+  mutate(
+    OR = round(OR, 2),
+    CI_low = round(CI_low, 2),
+    CI_high = round(CI_high, 2),
+    p = round(p, 3)
+  ) %>%
+  select(term, OR, CI_low, CI_high, p)
+
+df_fef_qcomp
+df_fef_qcomp <- df_fef_qcomp[-1,]
