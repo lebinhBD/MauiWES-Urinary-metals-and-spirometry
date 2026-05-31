@@ -11,7 +11,7 @@ library(magick)
 
 #### heat map ####
 
-data <- HM_inMaui_clean
+data <- HM_inMaui_clean_des
 
 table(data$location, useNA = "always")
 
@@ -106,7 +106,6 @@ data_metals_map <- df_median %>% select(
 
 dim(data_metals)
 table(data_metals$location, useNA = "always")
-
 
 data_metals_map_zscore <- data_metals_map %>%
   mutate(across(everything(), ~ scale(.)[, 1]))
@@ -221,7 +220,7 @@ ggsave("heatmap_metals_location_check.png",
 
 #### radar graph by locations ####
 
-data <- HM_inMaui_clean
+data <- HM_inMaui_clean_des
 dim(data)
 table(data$location, useNA = "always")
 
@@ -318,6 +317,44 @@ mytitle <- c("Wailuku/Kahului",
              "Lahaina")
 
 
+create_beautiful_radarchart <- function(
+    data,
+    pcol = "#00AFBB",
+    pfcol = scales::alpha(color, 0.5),# label = NULL,
+    axistype = 1,
+    vlabels = colnames(data),
+    vlcex = 1.2,
+    plwd = 2, 
+    plty = 1,
+    cglcol = "grey", 
+    cglty = 1, 
+    cglwd = 0.8,
+    axislabcol = "grey", 
+    caxislabels = NULL,
+    title = NULL, ...){
+  fmsb::radarchart(
+    data, 
+    axistype = axistype,
+    pcol = pcol,
+    pfcol = pfcol,
+    plwd = plwd, 
+    plty = plty,
+    cglcol = cglcol, 
+    cglty = cglty, 
+    cglwd = cglwd,
+    axislabcol =  axislabcol, 
+    vlcex = vlcex,
+    vlabels = vlabels,
+    caxislabels = caxislabels, 
+    title = title, ...
+  )
+}
+
+
+
+
+# Loop for each plot
+
 png("radar_HM_location.png", 
     width = 2000,
     height = 1600,
@@ -326,26 +363,32 @@ png("radar_HM_location.png",
 par(mar=rep(0.8,4),oma=c(0, 0, 2.5, 0))
 par(mfrow=c(2,2))
 
-# Loop for each plot
-
 for(i in 1:4){
-  radarchart(radar_data[c(1,2,i+2),],
-             axistype=1,
-             pcol=colors_border[i] ,
-             pfcol=colors_in[i] ,
-             plwd=1.5, 
-             plty=1 ,
-             pty = 20,
-             pcex = 0.05,
-             cglcol="grey",
-             cglty=1,
-             axislabcol="grey",
-             caxislabels=seq(-2,2,1),
-             cglwd=0.3,
-             vlcex=0.8,
-             title=mytitle[i])
+  
+  # Custom the radarChart!
+  create_beautiful_radarchart(radar_data[c(1,2,i+2),],
+                              # axistype=1,      
+                              pcol=colors_border[i] ,
+                              pfcol=colors_in[i] ,
+                              plwd=1.5, 
+                              plty=1 ,
+                              pty = 20,
+                              pcex = 0.05,
+                              #custom the grid
+                              cglcol="grey",
+                              cglty=1,
+                              axislabcol="grey",
+                              caxislabels=seq(-2,2,1),
+                              cglwd=0.3,
+                              
+                              #custom labels
+                              vlcex=0.8,
+                              
+                              #title
+                              title=mytitle[i]
+  )
 }
-mtext("", 
+mtext("A", 
       side = 3, 
       outer = TRUE, 
       line = 1.5, 
@@ -355,54 +398,72 @@ mtext("",
 dev.off()
 
 
+
 #### radar graph by locations overlayed  ####
 
-create_beautiful_radarchart <- function(data,
-                                        color = "#00AFBB",
-                                        # label = NULL,
-                                        vlabels = colnames(data),
-                                        vlcex = 1.2,
-                                        caxislabels = NULL,
-                                        title = NULL, ...){
-  radarchart(
-    data, axistype = 1,
-    # Customize the polygon
-    pcol = color, pfcol = scales::alpha(color, 0.5), plwd = 2, plty = 1,
-    # Customize the grid
-    cglcol = "grey", cglty = 1, cglwd = 0.8,
-    # Customize the axis
+create_beautiful_radarchart <- function(
+    data,
+    color = "#00AFBB",
+    axistype = 1,
+    vlabels = colnames(data),
+    vlcex = 1.2,
+    cglcol = "grey", 
+    cglty = 1, 
+    cglwd = 0.8,
     axislabcol = "grey", 
-    # Variable labels
-    vlcex = vlcex, vlabels = vlabels,
-    caxislabels = caxislabels, title = title, ...
+    caxislabels = NULL,
+    title = NULL, ...){
+  fmsb::radarchart(
+    df = data, 
+    axistype = axistype,
+    pcol = color,
+    pfcol = scales::alpha(color, 0.25),
+    plwd = 2, 
+    plty = 1,
+    cglcol = cglcol, 
+    cglty = cglty, 
+    cglwd = cglwd,
+    axislabcol =  axislabcol, 
+    vlcex = vlcex,
+    vlabels = vlabels,
+    caxislabels = caxislabels, 
+    title = title, ...
   )
 }
+
 
 rownames(radar_data) <- c("Max", "Min", "Kihei", "Kula", "Lahaina", "Wailuku/Kahului")
 View(radar_data)
 legend_labels <- c("Kihei", "Kula", "Lahaina", "Wailuku/Kahului")
 
+radar_data <- as.data.frame(radar_data)
+class(radar_data)
 
-png("radar_HM_location_overlayed_check.png", 
+png("radar_HM_location_overlayed.png", 
     width = 2000,
     height = 1700,
     res = 300)
 
 op <- par(mar = c(1, 2, 2, 2))
+# Create the radar charts
 create_beautiful_radarchart(
   data = radar_data, 
+  # caxislabels = c(0, 5, 10, 15, 20),
   caxislabels=seq(-2,2,1),
   color = c("#702963",
             "#35638A", 
             "#00A36C",
-            "#F2D74C"))
+            "#F2D74C")
+)
+# Add a horizontal legend
 legend(
   x = "bottom",
+  # # legend = rownames(radar_data[-c(1,2),]), 
   legend = legend_labels,
   horiz = TRUE,
   bty = "n",
   inset = c(0, -0.15),
-  pch = 16 ,
+  pch = 16,
   col = c("#CFC5D3",
           "#35638A", 
           "#5DBB7F",
@@ -414,8 +475,9 @@ legend(
 par(op)
 dev.off()
 
+
 imgA <- image_read("radar_HM_location.png")
-imgB <- image_read("radar_HM_location_overlayed_check.png")
+imgB <- image_read("radar_HM_location_overlayed.png")
 
 combined <- image_append(c(imgA, imgB), stack = TRUE) # stack vertically
 
@@ -426,10 +488,5 @@ imgD <- image_read("heatmap_metals_location_check.png")
 combined_1 <- image_append(c(imgC, imgD), stack = FALSE)
 
 image_write(combined_1, "FigS2_rada_heatmap.png")
-
-
-
-
-
 
 
