@@ -1109,7 +1109,7 @@ library(patchwork)
 p_weight_2iwqs <- (p_fvc_2iwqs|p_fev_2iwqs)/ (p_ff_2iwqs |p_fef_2iwqs )
 
 
-ggsave("2iwqs_weight_all_duration.png",
+ggsave("FigS16_2iwqs_weight_all_duration.png",
        plot = p_weight_2iwqs,
        width = 16,
        height = 14,
@@ -1141,4 +1141,4 @@ final_2iwqs <- image_annotate(
   weight = 700  # bold title text  
 )
 
-image_write(final_2iwqs, "final_2iwqss_duration.png")
+image_write(final_2iwqs, "FigS15_final_2iwqss_duration.png")
