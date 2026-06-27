@@ -653,4 +653,4 @@ plot <- image_append(c(row1, row2),
                      stack = TRUE)
 
 
-image_write(plot, "FigS4_plot_linear.png")
+image_write(plot, "FigS5_plot_linear.png")
