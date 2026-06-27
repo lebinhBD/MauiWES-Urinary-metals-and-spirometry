@@ -487,6 +487,6 @@ imgC <- image_read("combined_rada_heatmap.png")
 imgD <- image_read("heatmap_metals_location_check.png")
 combined_1 <- image_append(c(imgC, imgD), stack = FALSE)
 
-image_write(combined_1, "FigS2_rada_heatmap.png")
+image_write(combined_1, "FigS3_rada_heatmap.png")
 
 
