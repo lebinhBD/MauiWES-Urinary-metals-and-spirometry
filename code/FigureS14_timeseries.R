@@ -4,44 +4,41 @@ library(ggplot2)
 library(patchwork)
 
 #### coding for timeline ####
-data <- HM_inMaui_clean_des
-
+data <- HM_inMaui_clean_des.rds
+  
 data <- data %>% rename(
-"Nickel" = "ni_ln",
-"Arsenic" =  "as_ln",
-"Selenium" = "se_ln",
-"Copper" = "cu_ln",
-"Lead" = "pb_ln",
-"Cobalt" = "co_ln",
-"Chromium" =  "cr_ln",
-"Barium" =  "ba_ln",
-"Antimony" = "sb_ln",
-"Cesium" = "cs_ln",
-"Strontium" =  "sr_ln",
-"Iron" =  "fe_ln",
-"Manganese" = "mn_ln",
-"Magnesium" = "mg_ln", # y
-"Anadium" = "v_ln",
-"Lithium" =  "li_ln",
-"Calcium"= "ca_ln",
-"Zinc" =  "zn_ln",
-"bromine" =  "br_ln",
-"Molybdenum"=  "mo_ln",
-"Cadmium" = "cd_ln",
-"Tin" = "sn_ln",
-"Wolfram" = "w_ln",
-"Thallium"   = "tl_ln")
+  "Nickel" = "ni_ln",
+  "Arsenic" =  "as_ln",
+  "Selenium" = "se_ln",
+  "Copper" = "cu_ln",
+  "Lead" = "pb_ln",
+  "Cobalt" = "co_ln",
+  "Chromium" =  "cr_ln",
+  "Barium" =  "ba_ln",
+  "Antimony" = "sb_ln",
+  "Cesium" = "cs_ln",
+  "Strontium" =  "sr_ln",
+  "Iron" =  "fe_ln",
+  "Manganese" = "mn_ln",
+  "Magnesium" = "mg_ln", # y
+  "Anadium" = "v_ln",
+  "Lithium" =  "li_ln",
+  "Calcium"= "ca_ln",
+  "Zinc" =  "zn_ln",
+  "bromine" =  "br_ln",
+  "Molybdenum"=  "mo_ln",
+  "Cadmium" = "cd_ln",
+  "Tin" = "sn_ln",
+  "Wolfram" = "w_ln",
+  "Thallium"   = "tl_ln")
 
 class(data$Thallium)
 
 data <- data |> dplyr:::mutate(time_plot = case_when(
-  as.numeric(duration_months) >= 5.6 &    as.numeric(duration_months) < 6  ~ '1', ## 5- less than 6 months
-  as.numeric(duration_months) >= 6.07 &    as.numeric(duration_months) < 7  ~ '2', ## 6-7 months
-  as.numeric(duration_months) >= 10.4 &    as.numeric(duration_months) < 11  ~ '3', ## 10-less than 11 months
-  as.numeric(duration_months) >= 11.85 &    as.numeric(duration_months) <= 12  ~ '4', ## 11-less than 12 months
-  as.numeric(duration_months) > 12 &    as.numeric(duration_months) < 13  ~ '5', ## 12-less than 13 months
-  as.numeric(duration_months) >= 13 &    as.numeric(duration_months) < 14  ~ '6', ## 13 - less than 14 months
-  as.numeric(duration_months) >= 14  ~ '7', ## > 14 months
+  as.numeric(duration_months) >= 5.6 &    as.numeric(duration_months) < 7  ~ '1', ## 6-  7 months
+  as.numeric(duration_months) >= 10.4 &    as.numeric(duration_months) < 12  ~ '2', ## 10-less than 12 months
+  as.numeric(duration_months) > 12 &    as.numeric(duration_months) < 14  ~ '3', ## 12-less than 14 months
+  as.numeric(duration_months) >= 14  ~ '4', ## > 14 months
   .default = NA
 ))
 
@@ -49,59 +46,53 @@ table(data$time_plot, useNA = "always")
 table(data$duration_months, useNA = 'always')
 
 data$time_plot <- factor(data$time_plot,
-                         levels = c(1,2,3,4,5,6,7),
-                         labels = c("5-<6", 
-                                    "6-<7",
-                                    "10-<11",
-                                    "11-<12",
-                                    "12-<13",
-                                    "13-<14",
+                         levels = c(1,2,3,4),
+                         labels = c("6-7", 
+                                    "10-11",
+                                    "12-13",
                                     "14+"))
 
 table(data$time_plot, useNA = "always")
 table(data$duration_months, useNA = "always")
 class(data$duration_months)
-
-data$treat_burn <- factor(data$treat_burn,
-                          levels = c(1,0),
-                          labels = c("Burn zone", "Outside burn zone"))
-
-names(data)
+# 
+# data$treat_burn <- factor(data$treat_burn,
+#                           levels = c(1,0),
+#                           labels = c("Burn zone", "Outside burn zone"))
+# 
+# names(data)
 
 
 ## nickel ##
 plot_ni <- ggplot(data, aes(x = time_plot,
                             y = Nickel,
-                            color = treat_burn,
-                            group = treat_burn)) +
+                            group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               linewidth = 1,
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) + 
-  # error bars
+               color = "black") + 
   
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+  # scale_y_continuous(
+  #   limits = c(0, 2),
+  #   breaks = seq(0, 2, by = 0.5)) + ## will remove the values outside the range before calculate the mean and 95%CI
   
+  coord_cartesian(ylim = c(0, 2)) +
+  scale_y_continuous(
+    breaks = seq(0, 2, by = 0.5) )+ ## will not remove the values outside the range 
   labs( title = "Nickel",
         x = "Months from the wildfire",
-        y = "Log of Nickel", 
-        color = "Group") +
-  theme_bw(base_size = 18)+
+        y = "Log of Nickel")+ 
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("nickel_time.png",
+ggsave("nickel_time_full.png",
        plot = plot_ni,
        width = 14,
        height = 10, 
@@ -112,34 +103,30 @@ ggsave("nickel_time.png",
 plot_as <- ggplot(data, 
                   aes(x = time_plot,
                       y = Arsenic,
-                      color = treat_burn,
-                      group = treat_burn)) +
+                      group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               linewidth = 1,
+               color = "#2170b9",
+               fill = "#2170b9",
+               width = 0.7) +  # mean line
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black") + 
+  
+  coord_cartesian(ylim = c(0,4)) +
+  scale_y_continuous(
+    breaks = seq(0, 4, by = 1) )+
   
   labs(title = "Arsenic",
        x = "Months from the wildfire",
-       y = "Log of Arsenic", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Arsenic") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("as_time.png",
+ggsave("as_time_full.png",
        plot = plot_as,
        width = 14,
        height = 10, 
@@ -151,34 +138,30 @@ ggsave("as_time.png",
 plot_se <- ggplot(data, 
                   aes(x = time_plot,
                       y = Selenium,
-                      color = treat_burn,
-                      group = treat_burn)) +
+                      group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               linewidth = 1,
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7) +  # mean line
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black") +
+  
+  coord_cartesian(ylim = c(0, 6)) +
+  scale_y_continuous(
+    breaks = seq(0, 6, by = 1) )+ 
   
   labs(title = "Selenium",
        x = "Months from the wildfire",
-       y = "Log of Selenium", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Selenium") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("se_time.png",
+ggsave("se_time_full.png",
        plot = plot_se,
        width = 14,
        height = 10, 
@@ -189,34 +172,30 @@ ggsave("se_time.png",
 plot_cu <- ggplot(data, 
                   aes(x = time_plot,
                       y = Copper,
-                      color = treat_burn,
-                      group = treat_burn)) +
+                      group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               linewidth = 1,
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+ # mean line
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black") +   # error bars
+  
+  coord_cartesian(ylim = c(0, 4)) +
+  scale_y_continuous(
+    breaks = seq(0, 4, by = 1) )+
   
   labs(title = "Copper",
        x = "Months from the wildfire",
-       y = "Log of Copper", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Copper") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("cu_time.png",
+ggsave("cu_time_full.png",
        plot = plot_cu,
        width = 14,
        height = 10, 
@@ -227,34 +206,29 @@ ggsave("cu_time.png",
 plot_lead <- ggplot(data, 
                     aes(x = time_plot,
                         y = Lead,
-                        color = treat_burn,
-                        group = treat_burn)) +
+                        group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+  # mean line
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(-1, 0)) +
+  scale_y_continuous(
+    breaks = seq(-1, 0, by = 0.25) )+
   
   labs(title = "Lead",
        x = "Months from the wildfire",
-       y = "Log of Lead", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Lead") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("lead_time.png",
+ggsave("lead_time_full.png",
        plot = plot_lead,
        width = 14,
        height = 10, 
@@ -266,34 +240,29 @@ ggsave("lead_time.png",
 plot_co <- ggplot(data, 
                   aes(x = time_plot,
                       y = Cobalt,
-                      color = treat_burn,
-                      group = treat_burn)) +
+                      group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(-1, 0)) +
+  scale_y_continuous(
+    breaks = seq(-1, 0, by = 0.25) )+ 
   
   labs(title = "Cobalt",
        x = "Months from the wildfire",
-       y = "Log of Cobalt", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Cobalt") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("co_time.png",
+ggsave("co_time_full.png",
        plot = plot_co,
        width = 14,
        height = 10, 
@@ -305,34 +274,29 @@ ggsave("co_time.png",
 plot_cr <- ggplot(data, 
                   aes(x = time_plot,
                       y = Chromium,
-                      color = treat_burn,
-                      group = treat_burn)) +
+                      group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(0, 1)) +
+  scale_y_continuous(
+    breaks = seq(0, 1, by = 0.2) )+
   
   labs(title = "Chromium",
        x = "Months from the wildfire",
-       y = "Log of Chromium", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Chromium") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("cr_time.png",
+ggsave("cr_time_full.png",
        plot = plot_cr,
        width = 14,
        height = 10, 
@@ -343,34 +307,28 @@ ggsave("cr_time.png",
 plot_ba <- ggplot(data, 
                   aes(x = time_plot,
                       y = Barium,
-                      color = treat_burn,
-                      group = treat_burn)) +
+                      group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  coord_cartesian(ylim = c(0, 2)) +
+  scale_y_continuous(
+    breaks = seq(0, 2, by = 0.5) )+
   
   labs(title = "Barium",
        x = "Months from the wildfire",
-       y = "Log of Barium", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Barium") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("ba_time.png",
+ggsave("ba_time_full.png",
        plot = plot_ba,
        width = 14,
        height = 10, 
@@ -381,34 +339,28 @@ ggsave("ba_time.png",
 plot_antimony <- ggplot(data, 
                         aes(x = time_plot,
                             y = Antimony,
-                            color = treat_burn,
-                            group = treat_burn)) +
+                            group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+ 
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  coord_cartesian(ylim = c(0, 1)) +
+  scale_y_continuous(
+    breaks = seq(0, 1, by = 0.25) )+ 
   
   labs(title = "Antimony",
        x = "Months from the wildfire",
-       y = "Log of Antimony", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Antimony") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("antimony_time.png",
+ggsave("antimony_time_full.png",
        plot = plot_antimony,
        width = 14,
        height = 10, 
@@ -420,34 +372,28 @@ ggsave("antimony_time.png",
 plot_cesium <- ggplot(data, 
                       aes(x = time_plot,
                           y = Cesium,
-                          color = treat_burn,
-                          group = treat_burn)) +
+                          group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+ 
+  coord_cartesian(ylim = c(0, 3)) +
+  scale_y_continuous(
+    breaks = seq(0, 3, by = 0.5) )+
   
   labs(title = "Cesium",
        x = "Months from the wildfire",
-       y = "Log of Cesium", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Cesium") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("cesium_time.png",
+ggsave("cesium_time_full.png",
        plot = plot_cesium,
        width = 14,
        height = 10, 
@@ -459,34 +405,29 @@ ggsave("cesium_time.png",
 plot_strontium <- ggplot(data, 
                          aes(x = time_plot,
                              y = Strontium,
-                             color = treat_burn,
-                             group = treat_burn)) +
+                             group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(0,6)) +
+  scale_y_continuous(
+    breaks = seq(0, 6, by = 1) )+ 
   
   labs(title = "Strontium",
        x = "Months from the wildfire",
-       y = "Log of Strontium", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Strontium") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("strontium_time.png",
+ggsave("strontium_time_full.png",
        plot = plot_strontium,
        width = 14,
        height = 10, 
@@ -498,34 +439,29 @@ ggsave("strontium_time.png",
 plot_iron <- ggplot(data, 
                     aes(x = time_plot,
                         y = Iron,
-                        color = treat_burn,
-                        group = treat_burn)) +
+                        group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(0, 4)) +
+  scale_y_continuous(
+    breaks = seq(0, 4, by = 1) )+
   
   labs(title = "Iron",
        x = "Months from the wildfire",
-       y = "Log of Iron", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Iron") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("iron_time.png",
+ggsave("iron_time_full.png",
        plot = plot_iron,
        width = 14,
        height = 10, 
@@ -536,34 +472,29 @@ ggsave("iron_time.png",
 plot_manganese <- ggplot(data, 
                          aes(x = time_plot,
                              y = Manganese,
-                             color = treat_burn,
-                             group = treat_burn)) +
+                             group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(-1, 0)) +
+  scale_y_continuous(
+    breaks = seq(-1, 0, by = 0.25) )+ 
   
   labs(title = "Manganese",
        x = "Months from the wildfire",
-       y = "Log of Manganese", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Manganese") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("manganese_time.png",
+ggsave("manganese_time_full.png",
        plot = plot_manganese,
        width = 14,
        height = 10, 
@@ -575,73 +506,64 @@ ggsave("manganese_time.png",
 plot_magnesium <- ggplot(data, 
                          aes(x = time_plot,
                              y = Magnesium,
-                             color = treat_burn,
-                             group = treat_burn)) +
+                             group = 1) )+
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(0, 12)) +
+  scale_y_continuous(
+    breaks = seq(0, 12, by = 2) )+
   
   labs(title = "Magnesium",
        x = "Months from the wildfire",
-       y = "Log of Magnesium", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Magnesium") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("magnesium_time.png",
+ggsave("magnesium_time_full.png",
        plot = plot_magnesium,
        width = 14,
        height = 10, 
        dpi = 300)
 
 
-## Anadium ##
+## Vanadium ##
 
 plot_anadium <- ggplot(data, 
                        aes(x = time_plot,
                            y = Anadium,
-                           color = treat_burn,
-                           group = treat_burn)) +
+                           group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black") + 
   
-  labs(title = "Anadium",
+  coord_cartesian(ylim = c(-2, 0)) +
+  scale_y_continuous(
+    breaks = seq(-2, 0, by = 0.5) )+ 
+  
+  labs(title = "Vanadium",
        x = "Months from the wildfire",
-       y = "Log of Anadium", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Vanadium") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("anadium_time.png",
+ggsave("vanadium_time_full.png",
        plot = plot_anadium,
        width = 14,
        height = 10, 
@@ -652,34 +574,30 @@ ggsave("anadium_time.png",
 plot_lithium <- ggplot(data, 
                        aes(x = time_plot,
                            y = Lithium,
-                           color = treat_burn,
-                           group = treat_burn)) +
+                           group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  
+  coord_cartesian(ylim = c(0, 4)) +
+  scale_y_continuous(
+    breaks = seq(0, 4, by = 1) )+ 
   
   labs(title = "Lithium",
        x = "Months from the wildfire",
-       y = "Log of Lithium", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Lithium") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("lithium_time.png",
+ggsave("lithium_time_full.png",
        plot = plot_lithium,
        width = 14,
        height = 10, 
@@ -690,34 +608,29 @@ ggsave("lithium_time.png",
 plot_calcium <- ggplot(data, 
                        aes(x = time_plot,
                            y = Calcium,
-                           color = treat_burn,
-                           group = treat_burn)) +
+                           group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(0, 14)) +
+  scale_y_continuous(
+    breaks = seq(0, 14, by = 2) )+
   
   labs(title = "Calcium",
        x = "Months from the wildfire",
-       y = "Log of Calcium", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Calcium") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("calcium_time.png",
+ggsave("calcium_time_full.png",
        plot = plot_calcium,
        width = 14,
        height = 10, 
@@ -729,34 +642,29 @@ ggsave("calcium_time.png",
 plot_zinc <- ggplot(data, 
                     aes(x = time_plot,
                         y = Zinc,
-                        color = treat_burn,
-                        group = treat_burn)) +
+                        group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(0, 8)) +
+  scale_y_continuous(
+    breaks = seq(0, 8, by = 2) )+ 
   
   labs(title = "Zinc",
        x = "Months from the wildfire",
-       y = "Log of Zinc", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Zinc") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("zinc_time.png",
+ggsave("zinc_time_full.png",
        plot = plot_zinc,
        width = 14,
        height = 10, 
@@ -768,34 +676,30 @@ ggsave("zinc_time.png",
 plot_bromine <- ggplot(data, 
                        aes(x = time_plot,
                            y = bromine,
-                           color = treat_burn,
-                           group = treat_burn)) +
+                           group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(0, 10)) +
+  scale_y_continuous(
+    breaks = seq(0,10 , by = 2) )+
   
   labs(title = "Bromine",
        x = "Months from the wildfire",
-       y = "Log of Bromine", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Bromine") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("bromine_time.png",
+ggsave("bromine_time_full.png",
        plot = plot_bromine,
        width = 14,
        height = 10, 
@@ -806,34 +710,30 @@ ggsave("bromine_time.png",
 plot_molybdenum <- ggplot(data, 
                           aes(x = time_plot,
                               y = Molybdenum,
-                              color = treat_burn,
-                              group = treat_burn)) +
+                              group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(0, 6)) +
+  scale_y_continuous(
+    breaks = seq(0, 6, by = 2) )+
   
   labs(title = "Molybdenum",
        x = "Months from the wildfire",
-       y = "Log of Molybdenum", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Molybdenum") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("molybdenum_time.png",
+ggsave("molybdenum_time_full.png",
        plot = plot_molybdenum,
        width = 14,
        height = 10, 
@@ -845,34 +745,30 @@ ggsave("molybdenum_time.png",
 plot_cadmium <- ggplot(data, 
                        aes(x = time_plot,
                            y = Cadmium,
-                           color = treat_burn,
-                           group = treat_burn)) +
+                           group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(-2, 0)) +
+  scale_y_continuous(
+    breaks = seq(-2, 0, by = 0.25) )+
   
   labs(title = "Cadmium",
        x = "Months from the wildfire",
-       y = "Log of Cadmium", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Cadmium") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("cadmium_time.png",
+ggsave("cadmium_time_full.png",
        plot = plot_cadmium,
        width = 14,
        height = 10, 
@@ -884,34 +780,30 @@ ggsave("cadmium_time.png",
 plot_tin <- ggplot(data, 
                    aes(x = time_plot,
                        y = Tin,
-                       color = treat_burn,
-                       group = treat_burn)) +
+                       group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar",
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(-0.75,0.25 )) +
+  scale_y_continuous(
+    breaks = seq(-0.75, 0.25, by = 0.25) )+ 
   
   labs(title = "Tin",
        x = "Months from the wildfire",
-       y = "Log of Tin", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Tin") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("tin_time.png",
+ggsave("tin_time_full.png",
        plot = plot_tin,
        width = 14,
        height = 10, 
@@ -921,34 +813,28 @@ ggsave("tin_time.png",
 plot_wolfram <- ggplot(data, 
                        aes(x = time_plot,
                            y = Wolfram,
-                           color = treat_burn,
-                           group = treat_burn)) +
+                           group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  coord_cartesian(ylim = c(-2, 0)) +
+  scale_y_continuous(
+    breaks = seq(-2, 0, by = 0.5) )+ 
   
   labs(title = "Wolfram",
        x = "Months from the wildfire",
-       y = "Log of Wolfram", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
-  theme(legend.position = "bottom")
-
-ggsave("wolfram_time.png",
+       y = "Log of Wolfram") +
+  theme_bw(base_size = 20)+
+  theme(legend.position = "bottom")  
+  
+ggsave("wolfram_time_full.png",
        plot = plot_wolfram,
        width = 14,
        height = 10, 
@@ -958,34 +844,30 @@ ggsave("wolfram_time.png",
 plot_thallium <- ggplot(data, 
                         aes(x = time_plot,
                             y = Thallium,
-                            color = treat_burn,
-                            group = treat_burn)) +
+                            group = 1)) +
   stat_summary(fun = mean, 
-               geom = "line", 
-               size = 1,
-               position = position_dodge(width = 0.3)) +  # mean line
-  stat_summary(fun = mean, 
-               geom = "point", 
-               size = 3,
-               position = position_dodge(width = 0.3)) +
-  # aes(shape = treat_burn)) +  # mean points
+               geom = "bar", 
+               color = "#2170b9", # 
+               fill = "#2170b9",
+               width = 0.7)+
+
+  
   stat_summary(fun.data = mean_cl_normal, 
                geom = "errorbar", 
                width = 0.2,
-               position = position_dodge(width = 0.3)) +  # error bars
-  scale_color_manual(values = c(
-    "Burn zone" = "#CC5500",
-    "Outside burn zone" = "#088F8F"
-  )) +
+               color = "black")+
+  
+  coord_cartesian(ylim = c(-2, 0)) +
+  scale_y_continuous(
+    breaks = seq(-2, 0, by = 0.5) )+ 
   
   labs(title = "Thallium",
        x = "Months from the wildfire",
-       y = "Log of Thallium", 
-       color = "Group") +
-  theme_bw(base_size = 18)+
+       y = "Log of Thallium") +
+  theme_bw(base_size = 20)+
   theme(legend.position = "bottom")
 
-ggsave("thallium_time.png",
+ggsave("thallium_time_full.png",
        plot = plot_thallium,
        width = 14,
        height = 10, 
@@ -999,7 +881,8 @@ p <- (plot_ni |plot_as | plot_se | plot_cu) /
   (plot_calcium|plot_zinc| plot_bromine | plot_molybdenum)/ 
   (plot_cadmium |plot_tin|plot_wolfram |plot_thallium) + plot_layout(guides = "collect") & theme(legend.position = "bottom")
 
-ggsave("FigS13_heavy_metal_mean_new.png",
+
+ggsave("FigS14_heavy_metal_mean_new.png",
        plot = p,
        width = 30,
        height = 26,
