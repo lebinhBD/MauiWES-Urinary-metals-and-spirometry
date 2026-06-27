@@ -1,9 +1,6 @@
 library(dplyr)
 library(gtsummary)
 
-
-HM_inMaui_clean_des <- readRDS("~/Documents/Work/PAPERS/MauiWES_heavymetal/heavymetal_spiro/heavymetals_lung_103025/HM_inMaui_clean_des.rds")
-
 data_metal <- HM_inMaui_clean_des
 
 
