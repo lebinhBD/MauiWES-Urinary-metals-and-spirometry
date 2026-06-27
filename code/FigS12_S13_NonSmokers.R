@@ -1129,7 +1129,7 @@ library(patchwork)
 p_weight_2iwqs <- (p_fvc_2iwqs|p_fev_2iwqs)/ (p_ff_2iwqs |p_fef_2iwqs )
 
 
-ggsave("2iwqs_weight_nosmoker.png",
+ggsave("FigS13_2iwqs_weight_nosmoker.png",
        plot = p_weight_2iwqs,
        width = 16,
        height = 14,
@@ -2093,7 +2093,7 @@ imgB_labeled <- image_annotate(imgB, "[B] - Q-gcomputation", size = 70, gravity 
 combined <- image_append(c(imgA_labeled, imgB_labeled), stack = TRUE)
 
 # save
-image_write(combined, "combined_AB_nonsmokers.png")
+image_write(combined, "FigS12_combined_AB_nonsmokers.png")
 
 
 #### NON-SMOKERS in boot Q-gComp model ####
