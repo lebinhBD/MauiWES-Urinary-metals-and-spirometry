@@ -891,7 +891,7 @@ p_predi
 
 p_pip <- (p_fvc|p_fev)/ (p_ff |p_fef)
 
-ggsave("FigS8_pip_new_BKMR.png",
+ggsave("FigS9_pip_new_BKMR.png",
        plot = p_pip ,
        width = 16,
        height = 14,
@@ -913,7 +913,7 @@ p_uni   <-  p_uni  + plot_annotation(
   ))
 p_uni
 
-ggsave("FigS5_uni_curve_BKMR.png",
+ggsave("FigS6_uni_curve_BKMR.png",
        plot = p_uni ,
        width = 16,
        height = 14,
