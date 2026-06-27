@@ -1311,7 +1311,7 @@ p_fef_qcomp
 library(patchwork)
 p_weight_qcomp <- (p_fvc_qcomp|p_fev_qcomp)/ (p_ff_qcomp |p_fef_qcomp )
 
-ggsave("qcomp_weight_Laku.png",
+ggsave("FigS10_qcomp_weight_Laku.png",
        plot = p_weight_qcomp,
        width = 16,
        height = 14,
@@ -1899,7 +1899,7 @@ library(patchwork)
 p_weight_qcomp <- (p_fvc_qcomp|p_fev_qcomp)/ (p_ff_qcomp |p_fef_qcomp )
 
 
-ggsave("qcomp_weight_other.png",
+ggsave("FigS11_qcomp_weight_other.png",
        plot = p_weight_qcomp,
        width = 16,
        height = 14,
