@@ -268,7 +268,7 @@ p_kihei
 plot_com <- (p_kahului |  p_kihei) / (plot_kula |p_lahaina) 
 
 
-ggsave("FigS3_pca_treat_locations.png",
+ggsave("FigS4_pca_treat_locations.png",
        plot = plot_com,
        width = 18,
        height = 16,
