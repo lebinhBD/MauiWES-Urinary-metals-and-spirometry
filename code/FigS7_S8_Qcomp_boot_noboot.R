@@ -1603,7 +1603,7 @@ p_fef_qcomp
 library(patchwork)
 p_weight_noboot <- (p_fvc_qcomp|p_fev_qcomp)/ (p_ff_qcomp |p_fef_qcomp )
 
-ggsave("qcomp_weight_noboot.png",
+ggsave("FigS8_qcomp_weight_noboot.png",
        plot = p_weight_noboot,
        width = 16,
        height = 14,
@@ -1643,7 +1643,7 @@ imgB <- image_read("final_qcomp_boot.png")
 combined <- image_append(c(imgA, imgB), stack = TRUE)
 
 # save output
-image_write(combined, "overall_Qcomp_noboot_boot.png")
+image_write(combined, "FigS7_overall_Qcomp_noboot_boot.png")
 
 
 
