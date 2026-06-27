@@ -2,8 +2,6 @@ library(dplyr)
 library(survey)
 library(broom)
 
-HM_lung_demo_nomiss_111525_use <- readRDS("~/Documents/Work/PAPERS/MauiWES_heavymetal/heavymetal_spiro/heavymetals_lung_103025/HM_lung_demo_nomiss_111525_use.rds")
-
 data <- HM_lung_demo_nomiss_111525_use
 dim(data)
 
