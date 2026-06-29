@@ -45,7 +45,7 @@ whatever_inside <- as.data.frame(whatever_inside)
 View(whatever_inside)
 
 #### getting the shapefile for HI ####
-
+## the zipfile is big, you can download the file from the link https://gadm.org/download_country.html ## 
 usa_sf <- sf::st_read("gadm41_USA_shp/gadm41_USA_2.shp")
 
 hw_sf <- usa_sf |> subset(NAME_1 == "Hawaii")
