@@ -2914,7 +2914,7 @@ library(patchwork)
 plot_com1 <- (p_as | p_sb)/ 
   (p_cd | p_cu)/ 
   (p_pb | p_ni) /
-  (p_v | p_mg) 
+  (p_v | p_cr) 
 # # plot_annotation(
 # # title = "Percentage of abnormal pulmonary",
 # theme = theme(
