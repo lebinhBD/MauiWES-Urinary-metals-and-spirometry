@@ -1018,7 +1018,7 @@ plot_com <- (p_fev1 | p_fev1_quality)/
 #   plot.subtitle = element_text(size = 12 )
 # ))
 # plot_com
-ggsave("pulmonary_com.png",
+ggsave("Fig2_pulmonary_com.png",
        plot = plot_com,
        width = 14,
        height = 18,
