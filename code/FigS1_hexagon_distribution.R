@@ -189,6 +189,12 @@ geom_hex(data = df_geocode,
 
 
 p3
+ggsave(filename = "Kula.png",
+       plot = p3, 
+       width = 10,
+       height = 10,
+       dpi = 300,
+       units = "in")
 
 #### combining full map and two geographical maps in Lahaina/Kula into a big map ####
 
