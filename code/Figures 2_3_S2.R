@@ -2897,7 +2897,7 @@ plot_com <- plot_com + plot_annotation(
   ))
 # plot_com
 
-ggsave("FigS2_metals_town_new_05212026.png",
+ggsave("FigS2_24metals_town.png",
        plot = plot_com,
        width = 28,
        height = 30,
