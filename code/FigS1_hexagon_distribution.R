@@ -4,10 +4,6 @@ library(ggplot2)
 library(sp)
 
 
-MauiWES_ADI_index <- read.csv("/Users/binhle/Dropbox/Mac/Documents/Work/PAPERS/MauiWes_menphy/ADI_index_geo/MauiWES_ADI_index.csv")
-
-names(MauiWES_ADI_index)
-
 df_geocode <- read.csv("baseline_geocode.csv")
 df_geocode <- df_geocode %>% 
   select(participant_id,
@@ -22,10 +18,9 @@ View(df_geocode)
 
 
 
-
 #### getting the fire perimeter shapefile ####
 
-nc_sp <- sf::st_read("/Users/binhle/Dropbox/Mac/Documents/Work/PAPERS/MauiWES_heavymetal/heavymetal_spiro/heavymetals_lung_103025/check_PNAS/final_perimeter/fire_perimeter.shp")
+nc_sp <- sf::st_read("final_perimeter/fire_perimeter.shp")
 
 nc_sp <- as(nc_sp, "Spatial")
 
@@ -51,7 +46,7 @@ View(whatever_inside)
 
 #### getting the shapefile for HI ####
 
-usa_sf <- sf::st_read("/Users/binhle/Dropbox/Mac/Documents/Work/PAPERS/MauiWES_heavymetal/heavymetal_spiro/heavymetals_lung_103025/20250318/gadm41_USA_shp/gadm41_USA_2.shp")
+usa_sf <- sf::st_read("gadm41_USA_shp/gadm41_USA_2.shp")
 
 hw_sf <- usa_sf |> subset(NAME_1 == "Hawaii")
 
