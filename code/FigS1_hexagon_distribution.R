@@ -266,7 +266,7 @@ p1 +
                 top = 0.7) 
 
 
-ggsave(filename = "maui_bin_FULL.png",
+ggsave(filename = "FigS1_maui_bin_FULL.png",
        width = 10,
        height = 10,
        dpi = 300,
